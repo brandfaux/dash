@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnEngine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/ui/styles/base.css">
+<link rel="stylesheet" href="src/ui/styles/components.css">
+<link rel="stylesheet" href="src/ui/styles/pages.css">
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────────────── -->
+<nav id="mainNav" class="nav">
+  <div class="nav__logo">
+    <span class="nav__logo-mark" id="navLogoMark"></span>
+    <span class="nav__logo-rest" id="navLogoRest"></span>
+  </div>
+
+  <div class="nav__links" id="navLinks">
+    <button class="nav__btn active" data-nav="dashboard">Dashboard</button>
+    <button class="nav__btn" data-nav="courses">Courses</button>
+    <button class="nav__btn" data-nav="flashcards">Flashcards</button>
+    <button class="nav__btn" data-nav="vocab">Vocab</button>
+    <button class="nav__btn" data-nav="import">Import</button>
+  </div>
+
+  <div class="nav__end">
+    <span id="streakBadge" class="badge-pill"></span>
+    <span id="xpBadge" class="badge-pill badge-pill--accent"></span>
+  </div>
+</nav>
+
+<!-- ── Toast container ────────────────────────────────────────── -->
+<div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+
+<!-- ── Pages ─────────────────────────────────────────────────── -->
+<main class="page-wrap">
+  <section class="page active" data-page="dashboard" id="pageDashboard"></section>
+  <section class="page"        data-page="courses"   id="pageCourses"></section>
+  <section class="page"        data-page="flashcards" id="pageFlashcards"></section>
+  <section class="page"        data-page="vocab"     id="pageVocab"></section>
+  <section class="page"        data-page="import"    id="pageImport"></section>
+</main>
+
+<!-- ── Video Modal ────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <p class="label-caps">Video Lesson</p>
+        <h2 class="modal-title" id="videoModalTitle">Ready</h2>
+      </div>
+      <div class="modal-actions">
+        <a id="modalYtLink" href="#" target="_blank" rel="noreferrer" class="btn btn--ghost">Open on YouTube</a>
+        <button id="modalCompleteBtn" class="btn btn--ghost">Mark Complete</button>
+        <button id="modalCloseBtn" class="btn btn--ghost" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="modal-player" id="modalPlayerWrap"></div>
+    <div class="modal-footer">
+      <span class="modal-status label-mono" id="modalStatus">Progress: 0%</span>
+      <div class="modal-steps">
+        <button class="btn btn--step" data-pct="25">25%</button>
+        <button class="btn btn--step" data-pct="50">50%</button>
+        <button class="btn btn--step" data-pct="75">75%</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
