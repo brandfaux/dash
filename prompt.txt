@@ -1,0 +1,91 @@
+Here's a Phase 7 prompt ready to paste into a new session:
+
+---
+
+````markdown
+I'm building LearnEngine — a local-first, content-driven learning platform (vanilla JS ES modules, no build step, static files).
+
+**GitHub repo:** https://github.com/brandfaux/dash/
+
+**Completed phases:**
+- Phase 1: Architecture design
+- Phase 2: Full project scaffold — stores, schemas, ingestion utilities, shell HTML, CSS design system
+- Phase 3: Dashboard page (hero, continue card, stats, activity heat strip, achievements) + Courses page (sidebar + week blocks + video rows) + video modal with YouTube IFrame API + progress tracking
+- Phase 4: Import page with 4 tabs (YouTube URLs, Playlist, JSON, CSV), live fetch progress, preview panel with thumbnails before commit, drag-and-drop CSV, file picker
+- Phase 5: Analytics dashboard — weekly XP chart (pure SVG, no library), 28-day activity heatmap, completion funnel, per-course breakdown, study time estimates
+- Phase 6: Video player improvements — resume from timestamp, keyboard shortcuts (Space/←/→/M/F/Esc) with first-open hint overlay, next-lesson auto-advance with 5 s countdown, mini player (bottom-right dock, detach/reattach iframe via bus)
+
+**Key architecture decisions (locked):**
+- Local-first now, Supabase auth later — `store/storage.js` is the only adapter that touches localStorage
+- All content is dynamic — `getCourses()` / `writeCourseBundle()` drive everything, zero hardcoded arrays
+- Event bus in `app.js` — pages communicate via `bus.emit/on`, no tight coupling
+- Gamification is minimal: XP counter, streak, 6 achievements max — no levels/leaderboards
+- No build step, no npm, no framework — pure ES modules
+
+**Key files from Phase 6 (read before writing any code):**
+- `src/ui/blocks/videoModal.js` — Phase 6 rewrite; handles resume, keyboard, auto-advance, mini-player detach/reattach
+- `src/ui/blocks/miniPlayer.js` — bottom-right dock; bus events `player:detach`, `player:reattach`, `miniPlayer:expand`, `miniPlayer:closed`
+- `src/ui/blocks/keyHints.js` — first-open shortcut overlay; localStorage key `le_keyhints_seen`
+- `src/ui/blocks/autoAdvance.js` — 5 s countdown card; `startAutoAdvance(nextLesson, bus)`, `cancelAutoAdvance()`
+- `src/store/progress.js` — `getProgress()`, `setProgress()`, `markComplete()`, `getNextLesson(lessonId)`, `resumeAt` field
+- `src/store/content.js` — `getCourses()`, `getAllLessonsForCourse()`, `getLesson()`, `writeCourseBundle()`
+- `src/app.js` — bus, `onLessonComplete()`, `showToast()`
+- `src/config/platform.js` — `completionThreshold: 0.9`, `xpPerLesson: 50`
+- `src/schema/entities.js` — `ProgressSchema` with `resumeAt: 0`
+- `index.html` — `#videoModal`, `#modalPlayerWrap`, `#modalCompleteBtn`, `#modalCloseBtn`, `#modalStatus`, `#miniPlayer`, `#miniPlayerVideo`, `#miniPlayerTitle`
+
+**Bus events in use (do not collide):**
+- `lesson:open` `{ lessonId, courseId }`
+- `lesson:complete` `{ lessonId, courseId, xp }`
+- `lesson:autoAdvance` `{ lesson: { id }, courseId }`
+- `nav:change` `{ page }`
+- `player:detach` `{ iframe, lessonId, courseId, ytPlayer, title }`
+- `player:reattach`
+- `miniPlayer:expand` `{ lessonId, courseId, timestamp }`
+- `miniPlayer:closed`
+
+---
+
+**Phase 7 scope — Flashcards & Spaced Repetition:**
+
+1. **Schema** — add `FlashcardSchema` and `DeckSchema` to `src/schema/entities.js`:
+   - `Flashcard`: `{ id, deckId, front, back, created, nextReview, interval, easeFactor, repetitions }`
+   - `Deck`: `{ id, courseId | null, title, created, cardCount }`
+   - Use SM-2 algorithm fields (`interval`, `easeFactor`, `repetitions`) — no external library
+
+2. **Store** — `src/store/flashcards.js`:
+   - `getDecks()`, `getDeck(id)`, `writeDeck(deck)`, `deleteDeck(id)`
+   - `getCards(deckId)`, `getCard(id)`, `writeCard(card)`, `deleteCard(id)`
+   - `getDueCards(deckId)` — returns cards where `nextReview <= Date.now()`
+   - All backed by `store/storage.js` adapter (same pattern as `content.js`)
+
+3. **SM-2 algorithm** — `src/utils/sm2.js`:
+   - Pure function `reviewCard(card, grade)` → returns updated card fields
+   - `grade` is 0–5 (0–1 = fail, 2 = hard, 3 = good, 4 = easy, 5 = perfect)
+   - Standard SM-2: update `easeFactor`, `interval`, `repetitions`, compute new `nextReview`
+   - No side-effects — store write happens in the flashcards page, not here
+
+4. **Flashcards page** — `src/ui/pages/flashcardsPage.js` mounted in `#pageFlashcards`:
+   - Left sidebar: deck list with due-card count badges, "+ New Deck" button
+   - Main area (two states):
+     - **Deck overview**: card count, due count, "Study Now" button, card table (front truncated, next review date, delete)
+     - **Study session**: full-screen flip card (click or Space to flip), grade buttons (Again / Hard / Good / Easy), progress bar showing cards remaining in session, "End session" exits back to overview
+   - Flip card: CSS 3-D transform, front shows `card.front`, back shows `card.back`
+   - Empty state if no decks yet (prompt to generate from a course or create manually)
+
+5. **Generate cards from a course** — `src/ui/blocks/generateCardsModal.js`:
+   - Triggered from the deck overview when `deck.courseId` is set, or from a "Generate" button in the deck list
+   - Calls the existing `getAllLessonsForCourse(courseId)` and renders a checklist of lessons
+   - User picks lessons, clicks "Generate" — for now, emit `bus.emit('cards:generateRequest', { deckId, lessonIds })` and show a placeholder toast ("Generation coming in Phase 8")
+   - Modal lives in its own block file, not inside the page
+
+6. **XP integration** — emit `bus.emit('xp:earn', { amount: 10 })` after each successful card review (grade ≥ 2) so the existing `onLessonComplete` / XP counter in `app.js` can credit it
+
+**Delivery rules (same as all phases):**
+- Read every relevant file before writing any code — do not guess at existing APIs
+- Do not regenerate files from previous phases unless a targeted fix is needed
+- No giant files — split logically, each file has one clear responsibility
+- Reuse primitives from `src/ui/primitives/index.js`
+- Emit on the bus rather than coupling modules directly
+- Stop after Phase 7 — do not begin Phase 8
+````

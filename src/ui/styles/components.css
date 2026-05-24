@@ -559,3 +559,276 @@ select.select-input option { background: var(--surface); }
 @media (max-width: 600px) {
   .import-meta-row { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 6 — Video Player Improvements
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Key Hints Overlay ──────────────────────────────────────────────────── */
+
+.key-hints-overlay {
+  position:         absolute;
+  inset:            0;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  background:       rgba(0, 0, 0, 0.65);
+  backdrop-filter:  blur(4px);
+  border-radius:    inherit;
+  z-index:          50;
+  opacity:          0;
+  transition:       opacity 0.2s ease;
+  pointer-events:   none;
+}
+
+.key-hints-overlay--visible {
+  opacity:        1;
+  pointer-events: auto;
+}
+
+.key-hints-card {
+  background:    var(--surface-2, #1e1e2e);
+  border:        1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: var(--radius-lg, 12px);
+  padding:       2rem 2.5rem;
+  min-width:     280px;
+  max-width:     380px;
+  display:       flex;
+  flex-direction: column;
+  gap:           1.25rem;
+  box-shadow:    0 24px 48px rgba(0,0,0,0.4);
+}
+
+.key-hints-title {
+  color:       var(--text-muted, #888);
+  font-size:   0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin:      0;
+}
+
+.key-hints-list {
+  list-style:  none;
+  padding:     0;
+  margin:      0;
+  display:     flex;
+  flex-direction: column;
+  gap:         0.6rem;
+}
+
+.key-hints-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.75rem;
+}
+
+.key-hints-key {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  min-width:     52px;
+  padding:       0.2rem 0.5rem;
+  background:    var(--surface-3, #2a2a3e);
+  border:        1px solid var(--border, rgba(255,255,255,0.12));
+  border-radius: var(--radius-sm, 6px);
+  font-family:   var(--font-mono, 'JetBrains Mono', monospace);
+  font-size:     0.8rem;
+  color:         var(--text-primary, #e0e0e0);
+  white-space:   nowrap;
+}
+
+.key-hints-desc {
+  font-size:  0.875rem;
+  color:      var(--text-secondary, #b0b0c0);
+}
+
+.key-hints-dismiss {
+  align-self: flex-end;
+  margin-top: 0.25rem;
+}
+
+/* ─── Auto-advance Bar ───────────────────────────────────────────────────── */
+
+.auto-advance-bar {
+  position:    relative;
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+  gap:         1rem;
+  padding:     0.6rem 1rem;
+  margin-top:  0.5rem;
+  background:  var(--surface-2, #1e1e2e);
+  border:      1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: var(--radius-md, 8px);
+  overflow:    hidden;
+  animation:   slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.auto-advance-info {
+  display:       flex;
+  flex-direction: column;
+  gap:           0.15rem;
+  min-width:     0;
+}
+
+.auto-advance-label {
+  font-size:     0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:         var(--text-muted, #888);
+}
+
+.auto-advance-title {
+  font-size:     0.875rem;
+  color:         var(--text-primary, #e0e0e0);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     240px;
+}
+
+.auto-advance-controls {
+  display:     flex;
+  align-items: center;
+  gap:         0.75rem;
+  flex-shrink: 0;
+}
+
+.auto-advance-count {
+  font-family:  var(--font-mono, 'JetBrains Mono', monospace);
+  font-size:    1.25rem;
+  font-weight:  600;
+  color:        var(--accent, #7c6fcd);
+  min-width:    1.5ch;
+  text-align:   center;
+}
+
+.auto-advance-cancel {
+  font-size: 0.8rem;
+}
+
+/* Progress fill — CSS animation driven, duration set inline by JS */
+.auto-advance-progress {
+  position:      absolute;
+  bottom:        0;
+  left:          0;
+  right:         0;
+  height:        3px;
+  background:    var(--surface-3, #2a2a3e);
+}
+
+.auto-advance-progress-fill {
+  height:        100%;
+  width:         100%;
+  background:    var(--accent, #7c6fcd);
+  transform-origin: left;
+  transform:     scaleX(1);
+}
+
+.auto-advance-progress-fill--running {
+  animation: advanceCountdown linear forwards;
+  /* animation-duration injected via style attr */
+}
+
+@keyframes advanceCountdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* ─── Mini Player ────────────────────────────────────────────────────────── */
+
+#miniPlayer,
+.mini-player {
+  position:      fixed;
+  bottom:        1.5rem;
+  right:         1.5rem;
+  width:         320px;
+  background:    var(--surface-1, #13131f);
+  border:        1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: var(--radius-lg, 12px);
+  overflow:      hidden;
+  box-shadow:    0 12px 40px rgba(0,0,0,0.6);
+  z-index:       9999;
+  /* hidden by default */
+  opacity:       0;
+  transform:     translateY(12px) scale(0.97);
+  pointer-events: none;
+  transition:    opacity 0.25s ease, transform 0.25s ease;
+}
+
+.mini-player--visible {
+  opacity:        1;
+  transform:      translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.mini-player__video {
+  width:          100%;
+  aspect-ratio:   16 / 9;
+  background:     #000;
+  cursor:         pointer;
+}
+
+/* Make the contained iframe fill its slot */
+.mini-player__video iframe {
+  width:   100% !important;
+  height:  100% !important;
+  display: block;
+  pointer-events: none; /* clicks fall through to expand handler */
+}
+
+.mini-player__bar {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         0.4rem 0.6rem;
+  background:      var(--surface-2, #1e1e2e);
+  gap:             0.5rem;
+}
+
+.mini-player__title {
+  flex:          1;
+  font-size:     0.75rem;
+  color:         var(--text-secondary, #b0b0c0);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-player__actions {
+  display:     flex;
+  align-items: center;
+  gap:         0.25rem;
+  flex-shrink: 0;
+}
+
+.mini-player__btn {
+  background:    transparent;
+  border:        none;
+  color:         var(--text-muted, #888);
+  cursor:        pointer;
+  padding:       0.2rem 0.4rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size:     0.9rem;
+  line-height:   1;
+  transition:    color 0.15s, background 0.15s;
+}
+
+.mini-player__btn:hover {
+  color:       var(--text-primary, #e0e0e0);
+  background:  var(--surface-3, #2a2a3e);
+}
+
+.mini-player__btn--close:hover {
+  color:       var(--error, #f38ba8);
+}
+
+/* Clicking the video area (outside the bar) expands */
+.mini-player__video {
+  cursor: pointer;
+}

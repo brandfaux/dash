@@ -7,6 +7,7 @@ import { PLATFORM } from '../config/platform.js';
 import { ProgressSchema } from '../schema/entities.js';
 import { storage } from './storage.js';
 import { getUser } from './user.js';
+import { getCourses, getAllLessonsForCourse } from './content.js';
 
 const PREFIX = PLATFORM.storageKeys.progress;
 
@@ -83,4 +84,32 @@ export function getContinueLesson(lessons) {
 
   if (inProgress.length) return inProgress[0].lesson;
   return lessons.find(l => !getProgress(l.id).completed) ?? null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getNextLesson — Phase 6: Auto-advance to next lesson
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Return the lesson that follows `currentLessonId` within its course.
+ * Returns null if the current lesson is last, or not found.
+ *
+ * @param  {string} currentLessonId
+ * @returns {Promise<{ courseId: string, lesson: object } | null>}
+ */
+export async function getNextLesson(currentLessonId) {
+  const courses = await getCourses();
+
+  for (const course of courses) {
+    const lessons = await getAllLessonsForCourse(course.id);
+    const idx = lessons.findIndex(l => l.id === currentLessonId);
+    if (idx === -1) continue;                    // not in this course
+
+    const next = lessons[idx + 1];               // undefined if last
+    if (!next) return null;                      // end of course
+
+    return { courseId: course.id, lesson: next };
+  }
+
+  return null; // lesson not found in any course
 }

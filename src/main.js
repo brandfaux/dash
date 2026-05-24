@@ -16,6 +16,7 @@ import './ui/pages/vocab.js';
 
 // Blocks
 import './ui/blocks/videoModal.js';
+import { initMiniPlayer } from './ui/blocks/miniPlayer.js';
 import { renderNavBadges } from './ui/blocks/navBadges.js';
 
 // ── Branding ────────────────────────────────────────────────────
@@ -34,6 +35,10 @@ bus.on('lessonComplete', renderNavBadges);
 
 // ── Seed demo data if store is empty ────────────────────────────
 seedIfEmpty();
+
+// ── Initialize modules that need bus ────────────────────────────
+// Phase 6: wire up the mini player
+initMiniPlayer(bus);
 
 // ── Boot ─────────────────────────────────────────────────────────
 init();

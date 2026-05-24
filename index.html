@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/ui/styles/base.css">
 <link rel="stylesheet" href="src/ui/styles/components.css">
+<!-- Phase 6 stylesheet added AFTER components.css -->
+<link rel="stylesheet" href="src/ui/styles/phase6.components.css">
 <link rel="stylesheet" href="src/ui/styles/pages.css">
 <link rel="stylesheet" href="src/ui/styles/analytics.css">
 </head>
@@ -70,6 +72,19 @@
         <button class="btn btn--step" data-pct="50">50%</button>
         <button class="btn btn--step" data-pct="75">75%</button>
       </div>
+      <!-- auto-advance bar injected here by autoAdvance.js -->
+    </div>
+  </div>
+</div>
+
+<!-- ── Mini Player ──────────────────────────────────────────────────── -->
+<div id="miniPlayer" class="mini-player" aria-label="Mini video player">
+  <div class="mini-player__video" id="miniPlayerVideo"></div>
+  <div class="mini-player__bar">
+    <span class="mini-player__title label-mono" id="miniPlayerTitle"></span>
+    <div class="mini-player__actions">
+      <button class="mini-player__btn" id="miniPlayerExpand" aria-label="Expand">⤢</button>
+      <button class="mini-player__btn mini-player__btn--close" id="miniPlayerClose" aria-label="Close">✕</button>
     </div>
   </div>
 </div>
