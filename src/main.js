@@ -8,6 +8,7 @@ import { seedIfEmpty }         from './config/seed.js';
 
 // Pages
 import './ui/pages/dashboard.js';
+import './ui/pages/analytics.js';
 import './ui/pages/courses.js';
 import './ui/pages/import.js';
 import './ui/pages/flashcards.js';

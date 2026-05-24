@@ -1,0 +1,306 @@
+/* ui/styles/analytics.css — Phase 5: Analytics Dashboard styles */
+
+/* ── Page layout ─────────────────────────────────────────────────── */
+.analytics-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.analytics-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* ── 4-column summary grid ───────────────────────────────────────── */
+.grid-4-analytics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 820px) {
+  .grid-4-analytics { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .grid-4-analytics { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── XP chart card ───────────────────────────────────────────────── */
+.analytics-chart-card {
+  padding: 20px 20px 12px;
+}
+
+.analytics-chart-meta {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.analytics-chart-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.xp-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* SVG text styles (must be in CSS, not inline SVG for theme compat) */
+.xp-bar-value {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-muted);
+}
+
+.xp-bar-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-muted);
+}
+
+.xp-grid-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  fill: rgba(255,255,255,0.2);
+}
+
+.xp-bar {
+  transition: opacity 0.15s;
+  cursor: default;
+}
+
+.xp-bar--current {
+  filter: drop-shadow(0 0 6px rgba(245,166,35,0.35));
+}
+
+.xp-bar--hover,
+.xp-bar-group:hover .xp-bar {
+  opacity: 0.85;
+}
+
+/* ── Daily heatmap ───────────────────────────────────────────────── */
+.aheat-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.aheat-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.aheat-grid {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 5px;
+}
+
+.aheat-cell {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: transform 0.12s;
+  position: relative;
+}
+
+.aheat-cell:hover { transform: scale(1.15); z-index: 1; }
+
+.aheat-day {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.25);
+  user-select: none;
+}
+
+/* Intensity levels */
+.aheat-cell--l0 { background: rgba(255,255,255,0.04); }
+.aheat-cell--l1 { background: rgba(78,204,163,0.18); }
+.aheat-cell--l2 { background: rgba(78,204,163,0.38); }
+.aheat-cell--l3 { background: rgba(78,204,163,0.60); }
+.aheat-cell--l4 { background: rgba(78,204,163,0.85); }
+
+.aheat-cell--today {
+  outline: 1.5px solid rgba(255,255,255,0.3);
+  outline-offset: 1px;
+}
+
+.aheat-cell--sm {
+  width: 12px;
+  height: 12px;
+  aspect-ratio: unset;
+  border-radius: 3px;
+}
+.aheat-cell--sm .aheat-day { display: none; }
+
+/* ── Completion funnel ───────────────────────────────────────────── */
+.analytics-funnel-card {
+  padding: 24px;
+}
+
+.funnel-cols {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  height: 140px;
+}
+
+.funnel-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 120px;
+}
+
+.funnel-item--rate {
+  justify-content: flex-end;
+}
+
+.funnel-bar-wrap {
+  flex: 1;
+  width: 48px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.funnel-bar {
+  border-radius: 8px 8px 0 0;
+  transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  min-height: 4px;
+}
+
+.funnel-bar--started   { background: linear-gradient(180deg, var(--accent-1), rgba(233,69,96,0.3)); }
+.funnel-bar--completed { background: linear-gradient(180deg, var(--accent-3), rgba(78,204,163,0.3)); }
+
+.funnel-value {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.funnel-ring-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+
+.funnel-arrow {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  padding-bottom: 48px;
+  flex-shrink: 0;
+}
+
+/* ── Per-course rows ─────────────────────────────────────────────── */
+.course-stat-row {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.course-stat-row:last-child { border-bottom: none; }
+
+.course-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.course-stat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.course-stat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.course-stat-nums {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.course-stat-pct {
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+}
+
+.course-stat-sub {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+}
+
+/* ── Study time section ──────────────────────────────────────────── */
+.analytics-time-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.analytics-time-ring-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.time-ring-wrap {
+  flex-shrink: 0;
+}
+
+.analytics-time-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .analytics-time-grid {
+    grid-template-columns: 1fr;
+  }
+  .analytics-time-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .analytics-time-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .aheat-grid {
+    grid-template-columns: repeat(14, 1fr);
+    gap: 3px;
+  }
+  .funnel-cols { height: 110px; }
+  .grid-4-analytics { grid-template-columns: 1fr 1fr; }
+}

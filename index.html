@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="src/ui/styles/base.css">
 <link rel="stylesheet" href="src/ui/styles/components.css">
 <link rel="stylesheet" href="src/ui/styles/pages.css">
+<link rel="stylesheet" href="src/ui/styles/analytics.css">
 </head>
 <body>
 
@@ -21,6 +22,7 @@
 
   <div class="nav__links" id="navLinks">
     <button class="nav__btn active" data-nav="dashboard">Dashboard</button>
+    <button class="nav__btn" data-nav="analytics">Analytics</button>
     <button class="nav__btn" data-nav="courses">Courses</button>
     <button class="nav__btn" data-nav="flashcards">Flashcards</button>
     <button class="nav__btn" data-nav="vocab">Vocab</button>
@@ -39,7 +41,8 @@
 <!-- ── Pages ─────────────────────────────────────────────────── -->
 <main class="page-wrap">
   <section class="page active" data-page="dashboard" id="pageDashboard"></section>
-  <section class="page"        data-page="courses"   id="pageCourses"></section>
+  <section class="page"        data-page="analytics"  id="pageAnalytics"></section>
+  <section class="page"        data-page="courses"    id="pageCourses"></section>
   <section class="page"        data-page="flashcards" id="pageFlashcards"></section>
   <section class="page"        data-page="vocab"     id="pageVocab"></section>
   <section class="page"        data-page="import"    id="pageImport"></section>
