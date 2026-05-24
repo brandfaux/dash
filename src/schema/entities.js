@@ -168,19 +168,42 @@ export const VocabSetSchema = makeSchema(
   }
 );
 
-// ─── FlashcardDeck ───────────────────────────────────────────────────────────
+// ─── FlashcardDeck (Phase 7) ─────────────────────────────────────────────────
 
 export const FlashcardDeckSchema = makeSchema(
   () => ({
     id:        uuid(),
-    vocabSetId: null,
-    courseId:  '',
+    courseId:  null,    // string | null — linked course, if any
     title:     '',
-    cards:     [],   // [{ id, front, back, nextReview?, ease? }]
-    source:    'manual',
-    createdAt: now(),
+    created:   Date.now(),   // Unix timestamp (ms)
+    cardCount: 0,            // denormalised; updated on write/delete
   }),
   (r) => {
     if (!r.title) return 'flashcardDeck.title is required';
+    if (r.cardCount < 0) return 'flashcardDeck.cardCount must be >= 0';
+  }
+);
+
+// ─── Flashcard (SM-2 fields) ─────────────────────────────────────────────────
+
+export const FlashcardSchema = makeSchema(
+  () => ({
+    id:           uuid(),
+    deckId:       '',            // parent deck id
+    front:        '',            // question / prompt text
+    back:         '',            // answer text
+    created:      Date.now(),    // Unix timestamp (ms)
+    nextReview:   0,             // Unix timestamp (ms); 0 = new card / due immediately
+    interval:     0,             // days until next review (SM-2 I_n)
+    easeFactor:   2.5,           // SM-2 EF; starts at 2.5, floor 1.3
+    repetitions:  0,             // consecutive correct reviews (SM-2 n)
+  }),
+  (r) => {
+    if (!r.deckId) return 'flashcard.deckId is required';
+    if (!r.front) return 'flashcard.front is required';
+    if (!r.back) return 'flashcard.back is required';
+    if (r.interval < 0) return 'flashcard.interval must be >= 0';
+    if (r.easeFactor < 1.3) return 'flashcard.easeFactor must be >= 1.3';
+    if (r.repetitions < 0) return 'flashcard.repetitions must be >= 0';
   }
 );

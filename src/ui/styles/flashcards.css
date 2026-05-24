@@ -1,0 +1,459 @@
+/* ============================================================
+   Phase 7 — Flashcards & Spaced Repetition
+   Append to your existing CSS design-system file.
+   All selectors are namespaced fc- / gcm- to avoid collisions.
+   ============================================================ */
+
+/* ── Layout ──────────────────────────────────────────────── */
+.fc-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.fc-sidebar {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fc-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.fc-sidebar-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.fc-deck-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+
+.fc-deck-item {
+  /* empty */
+}
+
+.fc-deck-empty {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.fc-deck-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  color: var(--text);
+  font-size: var(--text-sm);
+  border-radius: 0;
+  transition: background 0.15s;
+}
+
+.fc-deck-btn:hover,
+.fc-deck-item.is-active .fc-deck-btn {
+  background: var(--surface-raised);
+}
+
+.fc-deck-item.is-active .fc-deck-btn {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.fc-deck-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Main area ───────────────────────────────────────────── */
+.fc-main {
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-6);
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.fc-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.fc-empty-icon {
+  font-size: 3rem;
+}
+
+/* ── Deck overview ───────────────────────────────────────── */
+.fc-overview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.fc-overview-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin: 0 0 var(--space-1);
+}
+
+.fc-overview-meta {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.fc-overview-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fc-danger {
+  color: var(--danger, #e54d4d);
+}
+
+/* ── Card table ──────────────────────────────────────────── */
+.fc-card-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.fc-card-table th,
+.fc-card-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.fc-card-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fc-td-front {
+  width: 55%;
+}
+
+.fc-td-review,
+.fc-td-reps {
+  width: 15%;
+  color: var(--text-muted);
+}
+
+.fc-td-del {
+  width: 5%;
+  text-align: right;
+}
+
+.fc-no-cards {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  padding: var(--space-4) 0;
+}
+
+/* ── Study session ───────────────────────────────────────── */
+.fc-study-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.fc-study-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-study-progress-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.fc-progress-bar-wrap {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fc-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+/* ── Flip card (main flashcard component) ───────────────── */
+.fc-flip-card-wrap {
+  perspective: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fc-flip-card {
+  width: 100%;
+  min-height: 220px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  outline: none;
+}
+
+.fc-flip-card:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.fc-flip-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.fc-flip-front,
+.fc-flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.fc-flip-front {
+  background: var(--surface-raised);
+}
+
+.fc-flip-back {
+  background: var(--accent-subtle, #eef2ff);
+  transform: rotateY(180deg);
+}
+
+.fc-card-text {
+  font-size: var(--text-lg);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
+
+.fc-flip-hint {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.fc-flip-hint.hidden,
+.fc-grade-buttons.hidden {
+  display: none;
+}
+
+/* ── Grade buttons ───────────────────────────────────────── */
+.fc-grade-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fc-grade-label {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.fc-grade-hint {
+  opacity: 0.65;
+}
+
+.fc-grade-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.fc-grade-btn {
+  min-width: 80px;
+  font-weight: 600;
+}
+
+.fc-grade-again { background: var(--danger, #e54d4d);    color: #fff; border: none; }
+.fc-grade-hard  { background: var(--warning, #f59e0b);   color: #fff; border: none; }
+.fc-grade-good  { background: var(--success, #22c55e);   color: #fff; border: none; }
+.fc-grade-easy  { background: var(--accent);             color: #fff; border: none; }
+
+.fc-grade-again:hover { filter: brightness(1.1); }
+.fc-grade-hard:hover  { filter: brightness(1.1); }
+.fc-grade-good:hover  { filter: brightness(1.1); }
+.fc-grade-easy:hover  { filter: brightness(1.1); }
+
+/* ── Session complete ────────────────────────────────────── */
+.fc-session-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+  min-height: 300px;
+}
+
+.fc-complete-icon {
+  font-size: 3.5rem;
+}
+
+/* ── Generate Cards Modal ────────────────────────────────── */
+.gcm-box {
+  max-width: 480px;
+  width: 90%;
+}
+
+.gcm-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+
+.gcm-hint {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-3);
+}
+
+.gcm-controls {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.gcm-sep {
+  color: var(--text-muted);
+}
+
+.gcm-list {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.gcm-lesson-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  transition: background 0.12s;
+}
+
+.gcm-lesson-row:hover {
+  background: var(--surface-raised);
+}
+
+.gcm-check {
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+.gcm-lesson-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gcm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.gcm-empty {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin: var(--space-4) 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .fc-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .fc-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 180px;
+  }
+
+  .fc-grade-btn {
+    min-width: 64px;
+    font-size: var(--text-sm);
+  }
+}
