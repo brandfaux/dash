@@ -1,36 +1,48 @@
 /**
  * ui/pages/dashboard.js
  * Full dashboard render — hero, stats, continue card, activity, achievements.
- * Re-renders on: navigate('dashboard'), statsChanged, lessonComplete.
  */
 
 import { bus, navigate, showToast } from '../../app.js';
-import { getStats, getUser }        from '../../store/user.js';
+import { getStats, getUser } from '../../store/user.js';
 import { getCourses, getAllLessonsForCourse } from '../../store/content.js';
 import { getProgress, getAllProgress, computeCourseProgress, getContinueLesson } from '../../store/progress.js';
-import { ACHIEVEMENTS }             from '../../config/achievements.js';
-import { PLATFORM }                 from '../../config/platform.js';
+import { ACHIEVEMENTS } from '../../config/achievements.js';
+import { PLATFORM } from '../../config/platform.js';
 import {
   sectionHeader, statCard, goalRing,
   heatStrip, achievementChips, progressBar, courseCard,
 } from '../primitives/index.js';
-import { openVideoModal }            from '../blocks/videoModal.js';
+import { openVideoModal } from '../blocks/videoModal.js';
+
+console.log('Dashboard module loaded'); // Debug
 
 // ─── Render ───────────────────────────────────────────────────────
 
 function render() {
+  console.log('Dashboard render called'); // Debug
+  
   const el = document.getElementById('pageDashboard');
-  if (!el) return;
+  if (!el) {
+    console.error('Dashboard element not found!');
+    return;
+  }
+  
+  console.log('Dashboard element found, rendering...');
 
-  const stats    = getStats();
-  const courses  = getCourses();
+  const stats = getStats();
+  const courses = getCourses();
   const progress = getAllProgress();
+  
+  console.log('Stats:', stats);
+  console.log('Courses:', courses);
+  console.log('Progress:', progress);
 
   // Compute totals across all courses
   const allLessons = courses.flatMap(c => getAllLessonsForCourse(c.id));
-  const totalDone  = allLessons.filter(l => progress[l.id]?.completed).length;
+  const totalDone = allLessons.filter(l => progress[l.id]?.completed).length;
   const totalCount = allLessons.length;
-  const totalPct   = totalCount ? Math.round((totalDone / totalCount) * 100) : 0;
+  const totalPct = totalCount ? Math.round((totalDone / totalCount) * 100) : 0;
 
   // Find best lesson to continue
   const continueLesson = getContinueLesson(allLessons);
@@ -40,13 +52,13 @@ function render() {
   const continueProgress = continueLesson ? getProgress(continueLesson.id) : null;
 
   // Today's completions
-  const todayIso    = new Date().toISOString().slice(0, 10);
-  const todayDone   = allLessons.filter(l => {
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayDone = allLessons.filter(l => {
     const p = progress[l.id];
     return p?.completed && p.lastSeen && new Date(p.lastSeen).toISOString().slice(0,10) === todayIso;
   }).length;
 
-  el.innerHTML = `
+  const html = `
     ${renderHero(stats, courses, totalDone, totalCount, totalPct, todayDone)}
     ${courses.length ? renderContinueCard(continueLesson, continueCourse, continueProgress) : ''}
     ${renderStatsRow(stats, totalDone, totalPct)}
@@ -54,7 +66,10 @@ function render() {
     ${renderActivity(stats)}
     ${renderAchievements(stats)}
   `;
-
+  
+  console.log('HTML generated, length:', html.length);
+  el.innerHTML = html;
+  
   bindEvents(el);
 }
 
@@ -178,8 +193,8 @@ function renderCourseOverview(courses, progressMap) {
 
   const cards = courses.map(c => {
     const lessons = getAllLessonsForCourse(c.id);
-    const ids     = lessons.map(l => l.id);
-    const prog    = computeCourseProgress(ids);
+    const ids = lessons.map(l => l.id);
+    const prog = computeCourseProgress(ids);
     return courseCard(c, prog, false);
   }).join('');
 
@@ -234,7 +249,6 @@ function bindEvents(el) {
   el.querySelectorAll('.course-card[data-course-id]').forEach(card => {
     card.addEventListener('click', () => {
       navigate('courses');
-      // Signal which course to show after navigation
       bus.emit('selectCourse', card.dataset.courseId);
     });
   });
@@ -243,7 +257,7 @@ function bindEvents(el) {
   if (continueCard) {
     continueCard.addEventListener('click', () => {
       const lessonId = continueCard.dataset.lessonId;
-      const courses  = getCourses();
+      const courses = getCourses();
       let target = null;
       for (const c of courses) {
         const found = getAllLessonsForCourse(c.id).find(l => l.id === lessonId);
@@ -258,8 +272,31 @@ function bindEvents(el) {
 
 // ─── Bus wiring ───────────────────────────────────────────────────
 
-bus.on('navigate',      page => { if (page === 'dashboard') render(); });
-bus.on('statsChanged',  ()   => { if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); });
-bus.on('lessonComplete',()   => { if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); });
+console.log('Setting up bus listeners for dashboard'); // Debug
 
-bus.on('contentChanged', () => { if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); });
+bus.on('navigate', page => { 
+  console.log('Navigate event received:', page); // Debug
+  if (page === 'dashboard') render(); 
+});
+
+bus.on('statsChanged', () => { 
+  console.log('StatsChanged event received'); // Debug
+  if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); 
+});
+
+bus.on('lessonComplete', () => { 
+  console.log('LessonComplete event received'); // Debug
+  if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); 
+});
+
+bus.on('contentChanged', () => { 
+  console.log('ContentChanged event received'); // Debug
+  if (document.getElementById('pageDashboard')?.closest('.page.active')) render(); 
+});
+
+// Initial render if dashboard is active
+console.log('Checking if dashboard is active...'); // Debug
+if (document.getElementById('pageDashboard')?.classList.contains('active')) {
+  console.log('Dashboard is active, rendering...');
+  render();
+}

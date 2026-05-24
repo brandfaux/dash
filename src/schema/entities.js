@@ -1,12 +1,6 @@
 /**
  * schema/entities.js
  * Runtime-validated entity shapes. No build step — plain JS validators.
- * When Zod is available (build pipeline), swap these for z.object() equivalents.
- *
- * Each schema exposes:
- *   parse(raw)   → validated object (throws on invalid)
- *   safeParse(raw) → { ok, data, error }
- *   defaults()   → fresh default instance
  */
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -46,13 +40,12 @@ export const LessonSchema = makeSchema(
     courseId:    '',
     moduleId:    '',
     title:       '',
-    videoId:     '',           // YouTube video ID
-    url:         '',           // original URL
-    thumbnail:   '',           // resolved thumbnail URL
-    duration:    0,            // seconds, 0 = unknown
-    position:    0,            // order within module
+    videoId:     '',
+    url:         '',
+    thumbnail:   '',
+    duration:    0,
+    position:    0,
     description: '',
-    // AI-reserved (never populated yet)
     summary:       null,
     aiQuiz:        null,
     speakingPrompts: [],
@@ -71,8 +64,8 @@ export const ModuleSchema = makeSchema(
     id:        uuid(),
     courseId:  '',
     title:     '',
-    position:  0,      // week/chapter number
-    topics:    '',     // short descriptor
+    position:  0,
+    topics:    '',
     lessonIds: [],
     createdAt: now(),
   }),
@@ -87,14 +80,13 @@ export const CourseSchema = makeSchema(
   () => ({
     id:          uuid(),
     title:       '',
-    level:       '',      // A1, A2, B1, B2, C1, C2, custom
-    label:       '',      // 'Beginner', 'Intermediate', etc.
+    level:       '',
+    label:       '',
     accent:      '#e94560',
     description: '',
     moduleIds:   [],
-    source:      'manual',  // 'manual' | 'youtube_playlist' | 'json' | 'csv'
+    source:      'manual',
     sourceUrl:   '',
-    // AI-reserved
     aiEnabled:   false,
     createdAt:   now(),
   }),
@@ -127,9 +119,9 @@ export const UserStatsSchema = makeSchema(
     userId:       '',
     xp:           0,
     streak:       0,
-    lastActive:   null,    // ISO date string YYYY-MM-DD
-    activityLog:  [],      // ISO date strings
-    achievements: [],      // achievement IDs
+    lastActive:   null,
+    activityLog:  [],
+    achievements: [],
     createdAt:    now(),
   }),
   (r) => {
@@ -137,15 +129,15 @@ export const UserStatsSchema = makeSchema(
   }
 );
 
-// ─── User (local identity, Supabase-compatible shape) ───────────────────────
+// ─── User ─────────────────────────────────────────────────────────────────────
 
 export const UserSchema = makeSchema(
   () => ({
     id:        uuid(),
     name:      'Learner',
-    email:     null,      // null until auth is enabled
+    email:     null,
     avatarUrl: null,
-    provider:  'local',   // 'local' | 'supabase'
+    provider:  'local',
     createdAt: now(),
   }),
   () => null
@@ -159,7 +151,7 @@ export const VocabSetSchema = makeSchema(
     courseId: '',
     lessonId: null,
     title:    '',
-    words:    [],   // [{ term, definition, example? }]
+    words:    [],
     source:   'manual',
     createdAt: now(),
   }),
@@ -173,10 +165,10 @@ export const VocabSetSchema = makeSchema(
 export const FlashcardDeckSchema = makeSchema(
   () => ({
     id:        uuid(),
-    courseId:  null,    // string | null — linked course, if any
+    courseId:  null,
     title:     '',
-    created:   Date.now(),   // Unix timestamp (ms)
-    cardCount: 0,            // denormalised; updated on write/delete
+    created:   Date.now(),
+    cardCount: 0,
   }),
   (r) => {
     if (!r.title) return 'flashcardDeck.title is required';
@@ -184,19 +176,22 @@ export const FlashcardDeckSchema = makeSchema(
   }
 );
 
+// Export alias for backward compatibility
+export const DeckSchema = FlashcardDeckSchema;
+
 // ─── Flashcard (SM-2 fields) ─────────────────────────────────────────────────
 
 export const FlashcardSchema = makeSchema(
   () => ({
     id:           uuid(),
-    deckId:       '',            // parent deck id
-    front:        '',            // question / prompt text
-    back:         '',            // answer text
-    created:      Date.now(),    // Unix timestamp (ms)
-    nextReview:   0,             // Unix timestamp (ms); 0 = new card / due immediately
-    interval:     0,             // days until next review (SM-2 I_n)
-    easeFactor:   2.5,           // SM-2 EF; starts at 2.5, floor 1.3
-    repetitions:  0,             // consecutive correct reviews (SM-2 n)
+    deckId:       '',
+    front:        '',
+    back:         '',
+    created:      Date.now(),
+    nextReview:   0,
+    interval:     0,
+    easeFactor:   2.5,
+    repetitions:  0,
   }),
   (r) => {
     if (!r.deckId) return 'flashcard.deckId is required';

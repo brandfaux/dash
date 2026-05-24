@@ -828,6 +828,44 @@ select.select-input option { background: var(--surface); }
   color:       var(--error, #f38ba8);
 }
 
+.modal-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+}
+
+.modal-player iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#ytPlayerTarget {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure modal card is properly sized */
+.modal-card {
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-card .modal-player {
+  flex-shrink: 0;
+}
+
+.modal-card .modal-footer {
+  flex-shrink: 0;
+}
+
 /* Clicking the video area (outside the bar) expands */
 .mini-player__video {
   cursor: pointer;

@@ -1,0 +1,170 @@
+/**
+ * ui/pages/dashboard.js - SIMPLIFIED VERSION FOR DEBUGGING
+ */
+
+import { bus, navigate } from '../../app.js';
+import { getStats, getUser } from '../../store/user.js';
+import { getCourses, getAllLessonsForCourse } from '../../store/content.js';
+import { getProgress } from '../../store/progress.js';
+
+console.log('✅ Dashboard module loaded');
+
+function render() {
+  console.log('🔄 Rendering dashboard...');
+  
+  const el = document.getElementById('pageDashboard');
+  if (!el) {
+    console.error('❌ Dashboard element #pageDashboard not found!');
+    return;
+  }
+  
+  console.log('✅ Found dashboard element');
+  
+  try {
+    // Get data
+    const stats = getStats();
+    const user = getUser();
+    const courses = getCourses();
+    
+    console.log('📊 Stats:', stats);
+    console.log('👤 User:', user);
+    console.log('📚 Courses:', courses);
+    
+    // Calculate totals
+    let totalLessons = 0;
+    let completedLessons = 0;
+    
+    courses.forEach(course => {
+      const lessons = getAllLessonsForCourse(course.id);
+      totalLessons += lessons.length;
+      lessons.forEach(lesson => {
+        const progress = getProgress(lesson.id);
+        if (progress.completed) completedLessons++;
+      });
+    });
+    
+    const completionRate = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    
+    // Simple HTML that will definitely show
+    const html = `
+      <div style="max-width: 1200px; margin: 0 auto;">
+        <div style="margin-bottom: 24px;">
+          <h1 style="font-family: var(--font-serif); font-size: 2rem; margin-bottom: 8px;">
+            Welcome back, ${user.name || 'Learner'}! 👋
+          </h1>
+          <p style="color: var(--text-muted);">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 2rem; font-weight: bold; color: var(--accent-3);">${stats.xp}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Total XP</div>
+          </div>
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 2rem; font-weight: bold; color: var(--accent-2);">${stats.streak}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Day Streak 🔥</div>
+          </div>
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 2rem; font-weight: bold; color: var(--accent-1);">${completedLessons}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Lessons Completed</div>
+          </div>
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 2rem; font-weight: bold;">${totalLessons}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Total Lessons</div>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="card" style="margin-bottom: 32px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>Overall Progress</span>
+            <span>${completionRate}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill" style="width: ${completionRate}%;"></div>
+          </div>
+        </div>
+        
+        <!-- Courses Section -->
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 16px;">Your Courses</h2>
+          ${courses.length === 0 ? `
+            <div class="card" style="text-align: center; padding: 48px;">
+              <p style="margin-bottom: 16px;">No courses yet. Import your first course to get started!</p>
+              <button class="btn btn--primary" id="importBtn">Import a Course →</button>
+            </div>
+          ` : `
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+              ${courses.map(course => {
+                const lessons = getAllLessonsForCourse(course.id);
+                const completed = lessons.filter(l => getProgress(l.id).completed).length;
+                const pct = lessons.length > 0 ? Math.round((completed / lessons.length) * 100) : 0;
+                return `
+                  <div class="card course-card" data-course-id="${course.id}" style="cursor: pointer;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                      <span class="badge-pill" style="background: ${course.accent || '#e94560'}20; color: ${course.accent || '#e94560'}">
+                        ${course.level || 'Course'}
+                      </span>
+                      <span style="font-size: 0.85rem; color: var(--text-muted);">${completed}/${lessons.length}</span>
+                    </div>
+                    <h3 style="font-family: var(--font-serif); font-size: 1.1rem; margin-bottom: 12px;">${course.title}</h3>
+                    <div class="progress-bar progress-bar--sm">
+                      <div class="progress-bar__fill" style="width: ${pct}%;"></div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+    
+    console.log('📝 Setting innerHTML...');
+    el.innerHTML = html;
+    console.log('✅ Dashboard rendered successfully');
+    
+    // Bind events
+    const importBtn = document.getElementById('importBtn');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => navigate('import'));
+    }
+    
+    document.querySelectorAll('.course-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const courseId = card.dataset.courseId;
+        navigate('courses');
+        bus.emit('selectCourse', courseId);
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ Error rendering dashboard:', error);
+    el.innerHTML = `<div class="card" style="padding: 40px; text-align: center; color: red;">
+      <h3>Error loading dashboard</h3>
+      <p>${error.message}</p>
+      <button onclick="location.reload()">Reload Page</button>
+    </div>`;
+  }
+}
+
+// Listen for navigation events
+bus.on('navigate', (page) => {
+  console.log('📍 Navigate event:', page);
+  if (page === 'dashboard') {
+    console.log('🎯 Dashboard page activated, rendering...');
+    render();
+  }
+});
+
+// Also render if dashboard is already active when module loads
+console.log('🏁 Checking initial page state...');
+const initialPage = document.querySelector('.page.active')?.dataset.page;
+console.log('Initial active page:', initialPage);
+if (initialPage === 'dashboard') {
+  console.log('🎯 Dashboard is already active, rendering immediately...');
+  render();
+} else {
+  console.log('⏳ Waiting for navigation to dashboard...');
+}
